@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>PDP Tools</title>
+        <style type="text/css">
+            fieldset{
+                display:inline-block;
+                float:left;
+            }
+            .img{
+                float:none;
+                width:60%
+            }
+            .right{
+                float:right;
+                width:20%;
+            }
+            .wide{
+                width:100%;
+            }
+        </style>
+    </head>
+    <body>
+        <form>
+            <div class="forms">
+                <fieldset>
+                    <legend>Training:</legend>
+                    Update After: <input type="text" size="5" />
+                    <select>
+                        <option value="epoch">Epoch</option>
+                        <option value="pattern">Pattern</option>
+                    </select>
+                    <br/>
+                    <input type="radio" name="group1" value="training" />
+                    <input type="submit" value="Options" />
+                    Epoch <input type="text" size="4" />
+                    <input type="submit" value="Stop" />
+                    <input type="submit" value="Run" />
+                    <input type="submit" value="Step" />
+                </fieldset>
+                <fieldset>
+                    <legend>Testing:</legend>
+                    Update After: <input type="text" size="5" />
+                    <input type="checkbox" name="testing" />Test
+                    <br/>
+                    <input type="radio" name="group1" value="training" />
+                    <input type="submit" value="Options" />
+                    Epoch <input type="text" size="4" />
+                    <input type="submit" value="Stop" />
+                    <input type="submit" value="Run" />
+                    <input type="submit" value="Step" />
+                </fieldset>
+                <fieldset>
+                    <input type="submit" value="Reset" />
+                    <input type="submit" value="Newstart" />
+                    <br/>
+                    <input type="submit" value="Load Weights" />
+                    <br/>
+                    <input type="submit" value="Save Weights" />
+                </fieldset>
+                <fieldset class="right" >
+                    <legend>Patterns:</legend>
+                    <select class="wide" name="patterns" multiple size="15">
+                    </select>
+                </fieldset>
+            </div>
+        </form>
+
+        <div class="img">
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+            <circle cx="100" cy="50" r="40" stroke="black" stroke-width="2" fill="red"/>
+            </svg>
+        </div>
+    </body>
+</html>
