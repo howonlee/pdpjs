@@ -1,3 +1,5 @@
+//everything is mutable. ALL THE THINGS ARE MUTABLE HAHAHAHAHAHAHA
+
 var bp_net = function(pools){
     var obj = bp_net_obj;
     obj.logistic = function(val){
@@ -16,7 +18,7 @@ var bp_net = function(pools){
                     if (type === "input" || type === "bias"){
                         continue;
                     }
-                    obj.pools[i].connect(obj.pools[1]);
+                    obj.pools[i].connect(obj.pools[i], obj.pools[1]);
                 }
             }
         }
@@ -28,17 +30,31 @@ var bp_net = function(pools){
     if (!obj.manual_bias){
         obj.add_bias_projections(obj);
     }
+    console.log(obj);
     obj.reset_weights = function(){
         console.log("resetting weights...");
         for (var i = 0; i < obj.pools.length; i++){
             for (var j = 0; j < obj.pools[i].projections.length; j++){
                 switch (obj.pools[i].projections[j].using.constraint_type){
-                    case "random":
-
+                    /*case "random":
+                        var len = obj.pools[i].projections[j].using.weights.length;
+                        obj.pools[i].projections[j].using.weights =
+                            Matrix.Random(len, len);
+                        obj.pools[i].projections[j].using.weights =
+                            obj.pools[i].projections[j].using.weights.map(
+                                    function(x) {
+                                        return(x - 0.5) * obj.train_options.wrange;
+                                    });
                         break;
                     case "scalar":
-
-                        break;
+                        var len = obj.pools[i].projections[j].using.weights.length;
+                        obj.pools[i].projections[j].using.weights = Matrix.Zero(len, len);
+                        obj.pools[i].projections[j].using.weights =
+                            obj.pools[i].projections[j].using.weights.map(
+                                    function(x){
+                                        return x + 1;//gotta return inner product
+                                    });
+                        break;*/
                 }
             }
         }
@@ -68,7 +84,7 @@ var bp_net = function(pools){
         obj.reset_net_input();
         obj.reset_weights();
         obj.environment.sequence_index = obj.net_patno;
-        obj.clamp_pools;
+        obj.clamp_pools();
     }
 
     obj.clamp_pools = function(){
