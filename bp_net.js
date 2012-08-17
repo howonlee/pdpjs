@@ -1,18 +1,19 @@
-//everything is mutable. ALL THE THINGS ARE MUTABLE HAHAHAHAHAHAHA
-
-var bp_net = function(pools){
+//everything is mutable, basically
+//you MUST set environment immediately after constructor. I don't get it, either
+var bp_net = function (pools) {
+    "use strict";
     var obj = bp_net_obj;
-    obj.logistic = function(val){
+    obj.logistic = function (val) {
         console.log("Logistic function with input val " + val);
         var retval = val;
-        if (retval > 15.935773974) { retval = 15.935773974 }
-        if (retval < -15.935773974) { retval = -15.935773974 }
+        if (retval > 15.935773974) { retval = 15.935773974; }
+        if (retval < -15.935773974) { retval = -15.935773974; }
         return (1.0 / (1.0 + Math.exp(-1 * retval)));
-    }
-    obj.add_bias_projections = function(){
+    };
+    obj.add_bias_projections = function () {
         console.log("adding bias projections...");
-        if (obj.pools){
-            if (obj.pools.length > 1){
+        if (obj.pools) {
+            if (obj.pools.length > 1) {
                 for (var i = 1; i < obj.pools.length; i++){
                     var type = obj.pools[i].type;
                     if (type === "input" || type === "bias"){
@@ -22,10 +23,11 @@ var bp_net = function(pools){
                 }
             }
         }
-    }
+    };
     obj.type = "bp";
     console.log(pools);
-    obj.pools = Array(pool("bias", 1, "bias")).concat(pools);
+    obj.pools = new Array(pool("bias", 1, "bias"))
+    obj.pools = obj.pools.concat(pools);
     console.log(obj.pools);
     if (!obj.manual_bias){
         obj.add_bias_projections(obj);
@@ -37,28 +39,28 @@ var bp_net = function(pools){
             for (var j = 0; j < obj.pools[i].projections.length; j++){
                 switch (obj.pools[i].projections[j].using.constraint_type){
                     /*case "random":
-                        var len = obj.pools[i].projections[j].using.weights.length;
-                        obj.pools[i].projections[j].using.weights =
-                            Matrix.Random(len, len);
-                        obj.pools[i].projections[j].using.weights =
-                            obj.pools[i].projections[j].using.weights.map(
-                                    function(x) {
-                                        return(x - 0.5) * obj.train_options.wrange;
-                                    });
-                        break;
-                    case "scalar":
-                        var len = obj.pools[i].projections[j].using.weights.length;
-                        obj.pools[i].projections[j].using.weights = Matrix.Zero(len, len);
-                        obj.pools[i].projections[j].using.weights =
-                            obj.pools[i].projections[j].using.weights.map(
-                                    function(x){
-                                        return x + 1;//gotta return inner product
-                                    });
-                        break;*/
+                      var len = obj.pools[i].projections[j].using.weights.length;
+                      obj.pools[i].projections[j].using.weights =
+                      Matrix.Random(len, len);
+                      obj.pools[i].projections[j].using.weights =
+                      obj.pools[i].projections[j].using.weights.map(
+                      function(x) {
+                      return(x - 0.5) * obj.train_options.wrange;
+                      });
+                      break;
+                      case "scalar":
+                      var len = obj.pools[i].projections[j].using.weights.length;
+                      obj.pools[i].projections[j].using.weights = Matrix.Zero(len, len);
+                      obj.pools[i].projections[j].using.weights =
+                      obj.pools[i].projections[j].using.weights.map(
+                      function(x){
+                      return x + 1;//gotta return inner product
+                      });
+                      break;*/
                 }
             }
         }
-    }
+    };
     obj.reset_weights(); //call
 
     obj.reset_net_input = function(){
@@ -66,7 +68,7 @@ var bp_net = function(pools){
         for (var i = 0; i < obj.pools.length; i++){
             obj.pools[i].net_input = Matrix.Zero(1, obj.pools[i].net_input.length);
         }
-    }
+    };
 
     obj.reset_net = function(){
         console.log("resetting net...");
@@ -85,10 +87,11 @@ var bp_net = function(pools){
         obj.reset_weights();
         obj.environment.sequence_index = obj.net_patno;
         obj.clamp_pools();
-    }
+    };
 
     obj.clamp_pools = function(){
         console.log("clamping pools...");
+        var pat = obj.environment.current_patterns;
     };
     obj.compute_output = function(){
         console.log("computing output...");
@@ -118,4 +121,4 @@ var bp_net = function(pools){
         obj.clamp_pools();
     };
     return obj;
-}
+};
