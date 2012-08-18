@@ -38,6 +38,7 @@ var bp_net = function (pools) {
         for (var i = 0; i < obj.pools.length; i++){
             for (var j = 0; j < obj.pools[i].projections.length; j++){
                 switch (obj.pools[i].projections[j].using.constraint_type){
+                    //gotta debug this shit
                     /*case "random":
                       var len = obj.pools[i].projections[j].using.weights.length;
                       obj.pools[i].projections[j].using.weights =
@@ -92,27 +93,76 @@ var bp_net = function (pools) {
     obj.clamp_pools = function(){
         console.log("clamping pools...");
         var pat = obj.environment.current_patterns;
+        for (var i = 0; i < obj.pools.length; i++){
+            obj.pools[i].target = obj.pools[i].target.map(function(x) {
+                return null;
+            });
+        }
+        var curr_pool = null;
+        for (var i = 0; i < pat.length; i++){
+            if (!pat[i].pool){
+                if (pat[i].type === "T"){
+                    curr_pool = obj.pools[obj.pools.length];
+                } else {
+                    curr_pool = obj.pools[1]; //first non-bias pool
+                }
+            }
+            switch (pat[i].type){
+                case "H":
+                    //FILL IN HERE
+                    break;
+                case "S":
+                    //FILL IN HERE
+                    break;
+                case "T":
+                    //FILL IN HERE
+                    break;
+            }
+        }
     };
     obj.compute_output = function(){
         console.log("computing output...");
+        // fill in here
     };
     obj.compute_error = function(){
         console.log("computing error...");
+        //fill in here
     };
     obj.compute_weds = function(){
         console.log("computing weds...");
+        for (var i = 0; i < obj.pools.length; i++){
+            for (var j = 0; j < obj.pools[i].projections.length; j++){
+                var proj = obj.pools[i].projections[j].using;
+                //FILL IN HERE
+            }
+        }
     };
     obj.change_weights = function(){
         console.log("changing weights...");
+        //fill in here
     };
     obj.sumstats = function(){
         console.log("summing stats....");
+        //fill in here
     };
     obj.train = function(){
         console.log("training...");
+        //fill in here
     };
     obj.test = function(){
         console.log("testing...");
+        while (obj.next_patno < obj.environment.sequences.length){
+            obj.patno = obj.next_patno;
+            obj.environment.sequence_index = obj.patno;
+            obj.clamp_pools();
+            obj.compute_output();
+            obj.compute_error();
+            obj.sumstats();
+            obj.next_patno = obj.patno + 1;
+            if (obj.done_updating_patno) { return false; }
+        }
+        obj.next_patno = 1;
+        obj.tss = 0;
     };
 
     obj.set_environment = function(value){
