@@ -38,26 +38,27 @@ var bp_net = function (pools) {
         for (var i = 0; i < obj.pools.length; i++){
             for (var j = 0; j < obj.pools[i].projections.length; j++){
                 switch (obj.pools[i].projections[j].using.constraint_type){
-                    //gotta debug this shit
-                    /*case "random":
-                      var len = obj.pools[i].projections[j].using.weights.length;
-                      obj.pools[i].projections[j].using.weights =
-                      Matrix.Random(len, len);
-                      obj.pools[i].projections[j].using.weights =
-                      obj.pools[i].projections[j].using.weights.map(
-                      function(x) {
-                      return(x - 0.5) * obj.train_options.wrange;
-                      });
-                      break;
-                      case "scalar":
-                      var len = obj.pools[i].projections[j].using.weights.length;
-                      obj.pools[i].projections[j].using.weights = Matrix.Zero(len, len);
-                      obj.pools[i].projections[j].using.weights =
-                      obj.pools[i].projections[j].using.weights.map(
-                      function(x){
-                      return x + 1;//gotta return inner product
-                      });
-                      break;*/
+                    case "random":
+                        console.log("doing random");
+                        var len = obj.pools[i].projections[j].using.weights.elements.length;
+                        obj.pools[i].projections[j].using.weights =
+                                Matrix.Random(len, len);
+                        obj.pools[i].projections[j].using.weights =
+                            obj.pools[i].projections[j].using.weights.map(
+                                    function(x) {
+                                        return(x - 0.5) * obj.train_options.wrange;
+                                    });
+                        break;
+                    case "scalar":
+                        console.log("doing scalar");
+                        var len = obj.pools[i].projections[j].using.weights.elements.length;
+                        obj.pools[i].projections[j].using.weights = Matrix.Zero(len, len);
+                        obj.pools[i].projections[j].using.weights =
+                            obj.pools[i].projections[j].using.weights.map(
+                                    function(x){
+                                        return x + 1;//gotta return inner product
+                                    });
+                        break;
                 }
             }
         }
