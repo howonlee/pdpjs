@@ -19,7 +19,7 @@ var bp_net = function (pools) {
                     if (type === "input" || type === "bias"){
                         continue;
                     }
-                    obj.pools[i].connect(obj.pools[i], obj.pools[1]);
+                    obj.pools[i].connect(obj.pools[i], obj.pools[0]);
                 }
             }
         }
@@ -99,6 +99,9 @@ var bp_net = function (pools) {
                 return null;
             });
         }
+        //currently, this whole damn thing will do jack shit
+        //because of locality of variables
+        //I make a curr_pool, it does nothing to anything
         var curr_pool = null;
         for (var i = 0; i < pat.length; i++){
             if (!pat[i].pool){
@@ -110,20 +113,46 @@ var bp_net = function (pools) {
             }
             switch (pat[i].type){
                 case "H":
-                    //FILL IN HERE
+                    curr_pool.activation = pat[i].pattern;
+                    var act = curr_pool.activation;
+                    var net_input = [];
+                    for (var i = 0; i < act.length; i++){
+                        if (act[i] == 1){ act[i] = 0.99999988; }
+                        if (act[i] == 0){ act[i] = 0.00000012; }
+                        net_input.push(Math.log(act[i] /(1 - act[i])));
+                    }
+                    curr_pool.clamped_activation = 2;
                     break;
                 case "S":
-                    //FILL IN HERE
+                    curr_pool.net_input = pat[i].pattern;
+                    curr_pool.clamped_activation = 1;
                     break;
                 case "T":
-                    //FILL IN HERE
+                    curr_pool.target = pat[i].pattern;
+                    curr_pool.clamped_error = true;
                     break;
             }
         }
     };
+
     obj.compute_output = function(){
         console.log("computing output...");
-        // fill in here
+        for (var i = 0; i < obj.pools.length; i++){
+            obj.pools[i].net_input = obj.pools[i].net_input_reset_value;
+            if (obj.pools[i].clamped_activation == 2) { continue; }
+            obj.pools[i].activation = obj.pools[i].activation_reset_value;
+            for (var j = 0; j < obj.pools[i].projections.length; j++;){
+                //fill in here
+            }
+            switch (obj.pools[i].activation_function){
+                case "logistic":
+                    //fill in here
+                    break;
+                case "linear":
+                    //fill in here
+                    break;
+            }
+        }
     };
     obj.compute_error = function(){
         console.log("computing error...");
