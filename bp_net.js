@@ -141,21 +141,49 @@ var bp_net = function (pools) {
             obj.pools[i].net_input = obj.pools[i].net_input_reset_value;
             if (obj.pools[i].clamped_activation == 2) { continue; }
             obj.pools[i].activation = obj.pools[i].activation_reset_value;
-            for (var j = 0; j < obj.pools[i].projections.length; j++;){
-                //fill in here
+            console.log("checkpoint 1");
+            for (var j = 0; j < obj.pools[i].projections.length; j++){
+                var from = obj.pools[i].projections[j].from;
+                console.log(from);
+                if (typeof from.activation == "number"){
+                    //aka, from is a bias pool
+                    
+                } else {
+                    
+                }
+                obj.pools[i].net_input = obj.pools[i].net_input.add(from.activation.x(obj.pools[i].projections[j].using.weights));
+                console.log("checkpoint 2");//and we never get here
             }
             switch (obj.pools[i].activation_function){
                 case "logistic":
-                    //fill in here
+                    obj.pools[i].activation = obj.pools[i].activation.map(function(x, i, j) { return x + obj.logistic(obj.pools[i].net_input.e(i, j));})
                     break;
                 case "linear":
-                    //fill in here
+                    obj.pools[i].activation = obj.pools[i].activation.add(obj.pools[i].net_input);
                     break;
             }
         }
     };
     obj.compute_error = function(){
         console.log("computing error...");
+        for (var i = obj.pools.length; i > 0; i--){
+            obj.pools[i].delta = obj.pools[i].delta_reset_value;
+            obj.pools[i].error = obj.pools[i].error_reset_value;
+            if (obj.pools[i].target){
+                obj.pools[i].error = obj.pools[i].error
+                                    .add(obj.pools[i].target)
+                                    .subtract(obj.pools[i].activation);
+            }
+            switch (obj.train_options.errmeas){
+                case "cee":
+                    obj.pools[i].delta = obj.pools[i].error;
+                    break;
+                case "sse":
+                    //fill this in
+                    break;
+            }
+
+        }
         //fill in here
     };
     obj.compute_weds = function(){

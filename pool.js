@@ -3,26 +3,22 @@ var pool = function(name, count, type, copy_from){
     var obj = {};
     obj.name = name;
     obj.unit_count = count;
-    tempArray = [];
-    for (var i = 0; i < count; i++){
-        tempSize.push(0);
-    }
-    obj.error = tempArray;
-    obj.error_reset_value = tempArray;
-    obj.target = tempArray;
-    obj.delta = tempArray;
-    obj.delta_reset_value = tempArray;
+    obj.error = Matrix.Zero(1, count);
+    obj.error_reset_value = Matrix.Zero(1, count);
+    obj.target = Matrix.Zero(1, count);
+    obj.delta = Matrix.Zero(1, count);
+    obj.delta_reset_value = Matrix.Zero(1, count);
     obj.clamped_activation = 0;//0 no, 1 soft, 2 hard
-    obj.activation = tempArray;
-    obj.activation_reset_value = tempArray;
-    obj.net_input = tempArray;
-    obj.net_input_reset_value = tempArray;
-    obj.activation_history = tempArray;
+    obj.activation = Matrix.Zero(1, count);
+    obj.activation_reset_value = Matrix.Zero(1, count);
+    obj.net_input = Matrix.Zero(1, count);
+    obj.net_input_reset_value = Matrix.Zero(1, count);
+    obj.activation_history = Matrix.Zero(1, count);
     obj.activation_function = "logistic";
-    obj.error_history = tempArray;
-    obj.extern_input = tempArray;
-    obj.excitation = tempArray;
-    obj.inhibition = tempArray;
+    obj.error_history = Matrix.Zero(1, count);
+    obj.extern_input = Matrix.Zero(1, count);
+    obj.excitation = Matrix.Zero(1, count);
+    obj.inhibition = Matrix.Zero(1, count);
     obj.projections = [];//normal js arrays for these
     obj.outgoing_projections = [];
     obj.noise = 0;
@@ -47,7 +43,7 @@ var pool = function(name, count, type, copy_from){
             break;
         case "bias":
             obj.clamped_activation = 2;
-            obj.activation = 1;
+            obj.activation = 1;//note that this is NOT a matrix
             break;
         case "connection":
             break;
