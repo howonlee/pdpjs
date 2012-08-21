@@ -243,7 +243,21 @@ var bp_net = function (pools) {
                 } else {
                     lr = obj.pools[i].projections[j].using.lr; 
                 }
-                //fill in here
+                obj.pools[i].projections[j].using.weight_deltas =
+                    obj.pools[i].projections[j].using.weight_deltas.x(lr)
+                    .subtract(obj.pools[i].projections[j].using.weights.x(decay))
+                    .add(obj.pools[i].projections[j].using.weight_deltas.x(mo));
+
+                if (obj.train_options.follow){
+                    //fill in here
+                }
+                obj.pools[i].projections[j].using.prev_weds =
+                    obj.pools[i].projections[j].using.weds;
+                obj.pools[i].projections[j].using.weights =
+                    obj.pools[i].projections[j].using.weights
+                    .add(obj.pools[i].projections[j].using.weight_deltas);
+                obj.pools[i].projections[j].using.weds =
+                    obj.pools[i].projections[j].using.weds.x(0);//to all zeroes
             }
         }
 
