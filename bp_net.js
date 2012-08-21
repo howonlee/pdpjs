@@ -57,8 +57,8 @@ var bp_net = function (pools) {
                         obj.pools[i].projections[j].using.weights = Matrix.Zero(len, len);
                         obj.pools[i].projections[j].using.weights =
                             obj.pools[i].projections[j].using.weights.map(
-                                    function(x){
-                                        return x + 1;//gotta return inner product
+                                    function(x, i, j){
+                                        return (x + 1) * obj.pools[i].projections[j].using.constraint.e(i, j);
                                     });
                         break;
                 }
@@ -86,7 +86,7 @@ var bp_net = function (pools) {
         obj.pss = 0;
         obj.gcor = 0;
         obj.css = 0;
-        for (var i = 1; i < obj.pools.length; i++){//start from 1
+        for (var i = 1; i < obj.pools.length; i++){//start from 1 
             obj.pools[i].activation = obj.pools[i].activation_reset_value;
         }
         obj.reset_net_input();
@@ -107,6 +107,7 @@ var bp_net = function (pools) {
         //currently, this whole damn thing will do jack shit
         //because of locality of variables
         //I make a curr_pool, it does nothing to anything
+        //we go on the glorious principle of "make it work goddammit" now
         var curr_pool = null;
         for (var i = 0; i < pat.length; i++){
             if (!pat[i].pool){
@@ -153,9 +154,9 @@ var bp_net = function (pools) {
                 console.log(from);
                 if (typeof from.activation === "number"){
                     //aka, from is a bias pool
-                    
+                    //fill in here
                 } else {
-                    
+                    //fill in here  
                 }
                 obj.pools[i].net_input = obj.pools[i].net_input.add(from.activation.x(obj.pools[i].projections[j].using.weights));
                 console.log("checkpoint 2");//and we never get here
@@ -236,8 +237,22 @@ var bp_net = function (pools) {
         var decay = obj.train_options.wdecay;
         for (var i = 0; i < obj.pools.length; i++){
             for (var j = 0; j < obj.pools[i].projections.length; j++){
-                //oh, if only I could get macros...
-                //FILL IN HERE
+                var lr = null;
+                if (!obj.pools[i].projections[j].using.lr){
+                    lr = obj.train_options.lrate;
+                } else {
+                    lr = obj.pools[i].projections[j].using.lr; 
+                }
+                //fill in here
+            }
+        }
+
+        if (obj.train_options.follow){
+            var den = p_css * obj.css;
+            if (den > 0){
+                obj.gcor = dp / (Math.sqrt(den));
+            } else {
+                obj.gcor = 0;
             }
         }
     };
@@ -245,6 +260,9 @@ var bp_net = function (pools) {
     //NOT TESTED
     obj.sumstats = function(){
         console.log("summing stats....");
+        obj.pss = 0.0;
+        obj.pce = 0.0;
+        if (obj.patno === 1){ obj.tss = 0.0; }
         //fill in here
     };
 
