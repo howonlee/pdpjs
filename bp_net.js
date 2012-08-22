@@ -2,7 +2,7 @@
 //you MUST set environment immediately after constructor. I don't get it, either
 var bp_net = function (pools) {
     "use strict";
-    var obj = bp_net_obj;
+    var obj = bp_net_obj;//this is the var with presets in
     //TESTED
     obj.logistic = function (val) {
         console.log("Logistic function with input val " + val);
@@ -156,16 +156,21 @@ var bp_net = function (pools) {
                     //aka, from is a bias pool
                     //fill in here
                 } else {
-                    //fill in here  
                 }
-                obj.pools[i].net_input = obj.pools[i].net_input.add(from.activation.x(obj.pools[i].projections[j].using.weights));
+                obj.pools[i].net_input = obj.pools[i].net_input.add(obj.pools[i].projections[j].using.weights.x(from.activation));
                 console.log("checkpoint 2");//and we never get here
             }
             switch (obj.pools[i].activation_function){
                 case "logistic":
-                    obj.pools[i].activation = obj.pools[i].activation.map(function(x, i, j) { return x + obj.logistic(obj.pools[i].net_input.e(i, j));})
+                    console.log("try logistic");
+                    obj.pools[i].activation = obj.pools[i].activation
+                        .map(function(x, i, j) {
+                            console.log(obj.pools[i].net_input.e(i, j));
+                            return x + obj.logistic(obj.pools[i].net_input.e(i, j));
+                        })
                         break;
                 case "linear":
+                    console.log("try linear");
                     obj.pools[i].activation = obj.pools[i].activation.add(obj.pools[i].net_input);
                     break;
             }
@@ -294,7 +299,8 @@ var bp_net = function (pools) {
     obj.train = function(){
         console.log("training...");
         var epoch_limit = (Math.floor(obj.epochno / obj.train_options.nepochs) + 1) * obj.train_options.nepochs;
-        while (obj.net_epochno <= epoch_limit){
+        console.log("Epoch limit: " + epoch_limit);
+        while (obj.next_epochno <= epoch_limit){
             obj.epochno = obj.next_epochno;
             while (obj.next_patno <= obj.environment.sequences.length){
                 obj.patno = obj.next_patno;
