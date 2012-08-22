@@ -104,38 +104,34 @@ var bp_net = function (pools) {
                 return null;
             });
         }
-        //currently, this whole damn thing will do jack shit
-        //because of locality of variables
-        //I make a curr_pool, it does nothing to anything
-        //we go on the glorious principle of "make it work goddammit" now
-        var curr_pool = null;
+        var pooli = -1;
         for (var i = 0; i < pat.length; i++){
             if (!pat[i].pool){
                 if (pat[i].type === "T"){
-                    curr_pool = obj.pools[obj.pools.length];
+                    pooli = obj.pools.length;
                 } else {
-                    curr_pool = obj.pools[1]; //first non-bias pool
+                    pooli = 1; //first non-bias pool
                 }
             }
             switch (pat[i].type){
                 case "H":
-                    curr_pool.activation = pat[i].pattern;
-                    var act = curr_pool.activation;
+                    obj.pools[pooli].activation = pat[i].pattern;
+                    var act = obj.pools[pooli].activation;
                     var net_input = [];
                     for (var i = 0; i < act.length; i++){
                         if (act[i] === 1){ act[i] = 0.99999988; }
                         if (act[i] === 0){ act[i] = 0.00000012; }
                         net_input.push(Math.log(act[i] /(1 - act[i])));
                     }
-                    curr_pool.clamped_activation = 2;
+                    obj.pools[pooli].clamped_activation = 2;
                     break;
                 case "S":
-                    curr_pool.net_input = pat[i].pattern;
-                    curr_pool.clamped_activation = 1;
+                    obj.pools[pooli].net_input = pat[i].pattern;
+                    obj.pools[pooli].clamped_activation = 1;
                     break;
                 case "T":
-                    curr_pool.target = pat[i].pattern;
-                    curr_pool.clamped_error = true;
+                    obj.pools[pooli].target = pat[i].pattern;
+                    obj.pools[pooli].clamped_error = true;
                     break;
             }
         }
@@ -152,13 +148,8 @@ var bp_net = function (pools) {
             for (var j = 0; j < obj.pools[i].projections.length; j++){
                 var from = obj.pools[i].projections[j].from;
                 console.log(from);
-                if (typeof from.activation === "number"){
-                    //aka, from is a bias pool
-                    //fill in here
-                } else {
-                }
                 obj.pools[i].net_input = obj.pools[i].net_input.add(obj.pools[i].projections[j].using.weights.x(from.activation));
-                console.log("checkpoint 2");//and we never get here
+                console.log("checkpoint 2");
             }
             switch (obj.pools[i].activation_function){
                 case "logistic":
