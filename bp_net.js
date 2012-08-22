@@ -27,14 +27,14 @@ var bp_net = function (pools) {
         }
     };
     obj.type = "bp";
-    obj.pools = new Array(pool("bias", 1, "bias"))
+    obj.pools = new Array(pool("bias", 1, "bias"));
     obj.pools = obj.pools.concat(pools);
     console.log(obj.pools);
     if (!obj.manual_bias){
         obj.add_bias_projections(obj);
     }
-    console.log(obj);
-    //NOT TESTED
+
+    //HALF TESTED
     obj.reset_weights = function(){
         console.log("resetting weights...");
         for (var i = 0; i < obj.pools.length; i++){
@@ -44,7 +44,7 @@ var bp_net = function (pools) {
                         console.log("doing random");
                         var len = obj.pools[i].projections[j].using.weights.elements.length;
                         obj.pools[i].projections[j].using.weights =
-                                Matrix.Random(len, len);
+                            Matrix.Random(len, len);
                         obj.pools[i].projections[j].using.weights =
                             obj.pools[i].projections[j].using.weights.map(
                                     function(x) {
@@ -67,11 +67,11 @@ var bp_net = function (pools) {
     };
     obj.reset_weights(); 
 
-    //NOT TESTED
+    //TESTED
     obj.reset_net_input = function(){
         console.log("resetting net inputs...");
         for (var i = 0; i < obj.pools.length; i++){
-            obj.pools[i].net_input = Matrix.Zero(1, obj.pools[i].net_input.length);
+            obj.pools[i].net_input = Vector.Zero(obj.pools[i].net_input.elements.length);
         }
     };
 
@@ -164,7 +164,7 @@ var bp_net = function (pools) {
             switch (obj.pools[i].activation_function){
                 case "logistic":
                     obj.pools[i].activation = obj.pools[i].activation.map(function(x, i, j) { return x + obj.logistic(obj.pools[i].net_input.e(i, j));})
-                    break;
+                        break;
                 case "linear":
                     obj.pools[i].activation = obj.pools[i].activation.add(obj.pools[i].net_input);
                     break;
@@ -180,8 +180,8 @@ var bp_net = function (pools) {
             obj.pools[i].error = obj.pools[i].error_reset_value;
             if (obj.pools[i].target){
                 obj.pools[i].error = obj.pools[i].error
-                                    .add(obj.pools[i].target)
-                                    .subtract(obj.pools[i].activation);
+                    .add(obj.pools[i].target)
+                    .subtract(obj.pools[i].activation);
             }
             switch (obj.train_options.errmeas){
                 case "cee":
@@ -198,7 +198,7 @@ var bp_net = function (pools) {
             for (var j = 0; j < obj.pools[i].projections.length; j++){
                 obj.pools[i].projections[j].from.error =
                     obj.projections[j].from.error
-                        .add(obj.pools[i].delta.x(obj.pools[i].projections[j].using.weights));
+                    .add(obj.pools[i].delta.x(obj.pools[i].projections[j].using.weights));
             }
             if (obj.pools[i].type === "connection"){
                 obj.pools[i].error_reset_value =
@@ -215,10 +215,10 @@ var bp_net = function (pools) {
             for (var j = 0; j < obj.pools[i].projections.length; j++){
                 obj.pools[i].projections[j].using.weds =
                     obj.pools[i].projections[j].using.weds
-                        .add( obj.pools[i].delta
-                                .transpose()
-                                .x(obj.pools[i].projections[j].from.activation)
-                            );
+                    .add( obj.pools[i].delta
+                            .transpose()
+                            .x(obj.pools[i].projections[j].from.activation)
+                        );
             }
         }
     };
@@ -237,11 +237,12 @@ var bp_net = function (pools) {
         var decay = obj.train_options.wdecay;
         for (var i = 0; i < obj.pools.length; i++){
             for (var j = 0; j < obj.pools[i].projections.length; j++){
-                var lr = null;
-                if (!obj.pools[i].projections[j].using.lr){
+                var proj = obj.pools[i].projections[j].using
+                    var lr = null;
+                if (!proj.lr){
                     lr = obj.train_options.lrate;
                 } else {
-                    lr = obj.pools[i].projections[j].using.lr; 
+                    lr = proj.lr; 
                 }
                 obj.pools[i].projections[j].using.weight_deltas =
                     obj.pools[i].projections[j].using.weight_deltas.x(lr)
@@ -249,7 +250,16 @@ var bp_net = function (pools) {
                     .add(obj.pools[i].projections[j].using.weight_deltas.x(mo));
 
                 if (obj.train_options.follow){
-                    //fill in here
+                    var sqwd = obj.pools[i].projections[j].using.weds
+                        .x(obj.pools[i].projections[j].using.weds);
+                    for (var k = 0; k < proj.weds.elements.length; k++){
+                        for (var l = 0; l < proj.weds.elements[k].length; l++){
+                            obj.css += proj.weds.elements[k][l];
+                        }
+                    }
+                    var dpprod = proj.weds.map(function(x, i, j){
+                        return x * proj.prev_weds.e(i, j);
+                    });
                 }
                 obj.pools[i].projections[j].using.prev_weds =
                     obj.pools[i].projections[j].using.weds;
@@ -333,5 +343,6 @@ var bp_net = function (pools) {
         obj.environment = value;
         obj.clamp_pools();
     };
+    obj.set_environment(xorenv)
     return obj;
 };

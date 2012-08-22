@@ -3,22 +3,22 @@ var pool = function(name, count, type, copy_from){
     var obj = {};
     obj.name = name;
     obj.unit_count = count;
-    obj.error = Matrix.Zero(1, count);
-    obj.error_reset_value = Matrix.Zero(1, count);
-    obj.target = Matrix.Zero(1, count);
-    obj.delta = Matrix.Zero(1, count);
-    obj.delta_reset_value = Matrix.Zero(1, count);
+    obj.error = Vector.Zero(count);
+    obj.error_reset_value = Vector.Zero(count);
+    obj.target = Vector.Zero(count);
+    obj.delta = Vector.Zero(count);
+    obj.delta_reset_value = Vector.Zero(count);
     obj.clamped_activation = 0;//0 no, 1 soft, 2 hard
-    obj.activation = Matrix.Zero(1, count);
-    obj.activation_reset_value = Matrix.Zero(1, count);
-    obj.net_input = Matrix.Zero(1, count);
-    obj.net_input_reset_value = Matrix.Zero(1, count);
-    obj.activation_history = Matrix.Zero(1, count);
+    obj.activation = Vector.Zero(count);
+    obj.activation_reset_value = Vector.Zero(count);
+    obj.net_input = Vector.Zero(count);
+    obj.net_input_reset_value = Vector.Zero(count);
+    obj.activation_history = Vector.Zero(count);
     obj.activation_function = "logistic";
-    obj.error_history = Matrix.Zero(1, count);
-    obj.extern_input = Matrix.Zero(1, count);
-    obj.excitation = Matrix.Zero(1, count);
-    obj.inhibition = Matrix.Zero(1, count);
+    obj.error_history = Vector.Zero(count);
+    obj.extern_input = Vector.Zero(count);
+    obj.excitation = Vector.Zero(count);
+    obj.inhibition = Vector.Zero(count);
     obj.projections = [];//normal js arrays for these
     obj.outgoing_projections = [];
     obj.noise = 0;
@@ -30,7 +30,7 @@ var pool = function(name, count, type, copy_from){
         obj.clamped_activation = 2;
         temp = [];
         for (var i = 0; i < count; i++){ temp.push(0.5); }
-        obj.activation = $M(temp)
+        obj.activation = $V(temp)
         obj.copy_from = copy_from;
         obj.copyback = true;
     }
@@ -70,5 +70,4 @@ var pool = function(name, count, type, copy_from){
 
     obj.get_error = function(){ return obj.error; }
     return obj;
-
 }
