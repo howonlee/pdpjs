@@ -147,17 +147,51 @@ var bp_net = function (pools) {
             console.log("checkpoint 1");
             for (var j = 0; j < obj.pools[i].projections.length; j++){
                 var from = obj.pools[i].projections[j].from;
+                console.log("From is : ");
                 console.log(from);
-                obj.pools[i].net_input = obj.pools[i].net_input.add(obj.pools[i].projections[j].using.weights.x(from.activation));
+                console.log("Current pools' net_input:");
+                console.log(obj.pools[i].net_input);
+                console.log("Current projection weights:");
+                console.log(obj.pools[i].projections[j].using.weights);
+                //gotta transpose this stuff!
+                var currWeights = obj.pools[i].projections[j].using.weights;
+                //I dunno where transposition goes, tbh
+                if (typeof from.activation != "number"){
+                    //obj.pools[i].net_input = obj.pools[i].net_input.add(obj.pools[i].projections[j].using.weights.transpose().x(from.activation));
+                    //currently ignoring from.activation right now
+                    obj.pools[i].net_input = obj.pools[i].net_input
+                        .map(function(x, k){ 
+                            var toReturn = x; 
+                            for (var l = 0; l < currWeights.elements[k-1].length; l++){
+                                toReturn += currWeights.elements[k-1][l];
+                            }
+                            return toReturn;
+                        });
+                } else {
+                    obj.pools[i].net_input = obj.pools[i].net_input
+                        .map(function(x, k){ 
+                            var toReturn = x; 
+                            console.log("currWeight:");
+                            console.log(currWeights.elements[k-1]);
+                            for (var l = 0; l < currWeights.elements[k-1].length; l++){
+                                toReturn += currWeights.elements[k-1][l];
+                            }
+                            return toReturn;
+                        });
+                }
                 console.log("checkpoint 2");
+                console.log("net_input is: ");
+                console.log(obj.pools[i].net_input);
             }
             switch (obj.pools[i].activation_function){
                 case "logistic":
                     console.log("try logistic");
                     obj.pools[i].activation = obj.pools[i].activation
                         .map(function(x, i, j) {
-                            console.log(obj.pools[i].net_input.e(i, j));
-                            return x + obj.logistic(obj.pools[i].net_input.e(i, j));
+                            console.log("Pool:");
+                            console.log(obj.pools[i-1]);
+                            console.log(obj.pools[i-1].net_input.e(i, j));
+                            return x + obj.logistic(obj.pools[i-1].net_input.e(i, j));
                         })
                         break;
                 case "linear":
