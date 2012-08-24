@@ -2,7 +2,7 @@ var projection = function(rec, send, type, con){
     var obj = {};
     obj.constraint_type = "random";
     obj.constraint = [];
-    obj.lr = [];
+    obj.lr = null;
     if (type){
         obj.constraint_type = type;
         if (con){

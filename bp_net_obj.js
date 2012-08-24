@@ -10,7 +10,7 @@ bp_net_obj = {
     pools_by_name : null,
     environment : null,
     train_options: {
-        "nepochs" : 100,
+        "nepochs" : 30,
         "ncycles" : 50,
         "lflag" : 1,
         "lrate" : 0.5, 

@@ -89,7 +89,9 @@ var bp_net = function (pools) {
         console.log(obj.pools);
         var pat = obj.environment.current_patterns;
         for (var i = 0; i < obj.pools.length; i++){
-            obj.pools[i].target = goog.math.Matrix.map(obj.pools[i].target, function(x){ return null; });
+            //obj.pools[i].target = goog.math.Matrix.map(obj.pools[i].target, function(x){ return null; });
+            //maybe this
+            obj.pools[i].target = null;
         }
         var pooli = -1;
         for (var i = 0; i < pat.length; i++){
@@ -184,17 +186,29 @@ var bp_net = function (pools) {
                     .add(obj.pools[i].target)
                     .subtract(obj.pools[i].activation);
             }
+            //note that the above will never happen
             console.log("checkpoint 2: adjusted error if pool was target");
             switch (obj.train_options.errmeas){
                 case "cee":
                     obj.pools[i].delta = obj.pools[i].error;
                     break;
                 case "sse":
-                    obj.pools[i].delta = obj.pools[i].error
-                        .map(function(x, i, j){
-                            var act = obj.pools[i-1].activation.e(i, j);
-                            return x * act * (1 - act);
-                        });
+                    if (typeof obj.pools[i].activation != "number"){
+                        obj.pools[i].delta = goog.math.Matrix.map(
+                                obj.pools[i].error,
+                                function(x, k, l){
+                                    var act = obj.pools[i].activation.getValueAt(k, l);
+                                    return x * act * (1 - act);
+                                });
+                    } else {
+                        obj.pools[i].delta = goog.math.Matrix.map(
+                                obj.pools[i].error,
+                                function(x, k, l){
+                                    var act = obj.pools[i].activation;
+                                    return x * act * (1 - act);
+                                }
+                                );
+                    }
                     break;
             }
             console.log("checkpoint 3: adjusted delta with error");
@@ -204,21 +218,15 @@ var bp_net = function (pools) {
                 console.log("weights:");
                 console.log(obj.pools[i].projections[j].using.weights);
                 console.log("newerrordelta:");
-                var newerrordelta = obj.pools[i].delta.map(function(x, k){
-                    var toReturn = x;
-                    for (var l = 0; l < obj.pools[i].projections[j].using.weights.elements[k-1].length; l++){
-                        x += obj.pools[i].projections[j].using.weights.elements[k-1][l];
-                    }
-                    return toReturn;
-                });
+                var newerrordelta = obj.pools[i].delta.multiply(
+                            obj.pools[i].projections[j].using.weights
+                        );
                 console.log(newerrordelta);
                 console.log("currerror:");
                 console.log(obj.pools[i].projections[j].from.error);
-                if (obj.pools[i].projections[j].from.error){//stopgap measure, there's something fishy about this
-                    obj.pools[i].projections[j].from.error =
-                        obj.pools[i].projections[j].from.error
-                        .add(newerrordelta);
-                }
+                obj.pools[i].projections[j].from.error =
+                    obj.pools[i].projections[j].from.error
+                    .add(newerrordelta);
             }
             console.log("checkpoint 4: adjusted projection errors");
             if (obj.pools[i].type === "connection"){
@@ -234,11 +242,13 @@ var bp_net = function (pools) {
         console.log("computing weds...");
         for (var i = 0; i < obj.pools.length; i++){
             for (var j = 0; j < obj.pools[i].projections.length; j++){
+                console.log("current delta:");
+                console.log(obj.pools[i].delta);
                 obj.pools[i].projections[j].using.weds =
                     obj.pools[i].projections[j].using.weds
                     .add( obj.pools[i].delta
-                            .transpose()
-                            .x(obj.pools[i].projections[j].from.activation)
+                            .getTranspose()
+                            .multiply(obj.pools[i].projections[j].from.activation)
                         );
             }
         }
@@ -253,33 +263,33 @@ var bp_net = function (pools) {
             p_css = obj.css;
             obj.css = 0;
         }
-
+        console.log("checkpoint 1: set up temp vars");
         var mo = obj.train_options.momentum;
         var decay = obj.train_options.wdecay;
         for (var i = 0; i < obj.pools.length; i++){
             for (var j = 0; j < obj.pools[i].projections.length; j++){
-                var proj = obj.pools[i].projections[j].using
-                    var lr = null;
+                var proj = obj.pools[i].projections[j].using;
+                var lr = null;
                 if (!proj.lr){
                     lr = obj.train_options.lrate;
                 } else {
                     lr = proj.lr; 
                 }
+                console.log("lr:");
+                console.log(lr);
                 obj.pools[i].projections[j].using.weight_deltas =
-                    obj.pools[i].projections[j].using.weight_deltas.x(lr)
-                    .subtract(obj.pools[i].projections[j].using.weights.x(decay))
-                    .add(obj.pools[i].projections[j].using.weight_deltas.x(mo));
+                    obj.pools[i].projections[j].using.weight_deltas.multiply(lr)
+                    .subtract(obj.pools[i].projections[j].using.weights.multiply(decay))
+                    .add(obj.pools[i].projections[j].using.weight_deltas.multiply(mo));
 
                 if (obj.train_options.follow){
                     var sqwd = obj.pools[i].projections[j].using.weds
-                        .x(obj.pools[i].projections[j].using.weds);
-                    for (var k = 0; k < proj.weds.elements.length; k++){
-                        for (var l = 0; l < proj.weds.elements[k].length; l++){
-                            obj.css += proj.weds.elements[k][l];
-                        }
-                    }
-                    var dpprod = proj.weds.map(function(x, i, j){
-                        return x * proj.prev_weds.e(i, j);
+                        .multiply(obj.pools[i].projections[j].using.weds);
+                    goog.math.Matrix.forEach(proj.weds, function(x){
+                        obj.css += x;
+                    });
+                    var dpprod = proj.weds.map(function(x, k, l){
+                        return x * proj.prev_weds.getValueAt(k, l);
                     });
                 }
                 obj.pools[i].projections[j].using.prev_weds =
@@ -288,10 +298,10 @@ var bp_net = function (pools) {
                     obj.pools[i].projections[j].using.weights
                     .add(obj.pools[i].projections[j].using.weight_deltas);
                 obj.pools[i].projections[j].using.weds =
-                    obj.pools[i].projections[j].using.weds.x(0);//to all zeroes
+                    obj.pools[i].projections[j].using.weds.multiply(0);//to all zeroes
             }
         }
-
+        console.log("checkpoint 2: changed weights");
         if (obj.train_options.follow){
             var den = p_css * obj.css;
             if (den > 0){
@@ -300,6 +310,7 @@ var bp_net = function (pools) {
                 obj.gcor = 0;
             }
         }
+        console.log("checkpoint 3: changed following");
     };
 
     //NOT TESTED
@@ -314,10 +325,13 @@ var bp_net = function (pools) {
     //NOT TESTED
     obj.train = function(){
         console.log("training...");
-        var epoch_limit = (Math.floor(obj.epochno / obj.train_options.nepochs) + 1) * obj.train_options.nepochs;
+        //var epoch_limit = (Math.floor(obj.epochno / obj.train_options.nepochs) + 1) * obj.train_options.nepochs;
+        //the below seems to make more sense
+        var epoch_limit = obj.train_options.nepochs;
         console.log("Epoch limit: " + epoch_limit);
         while (obj.next_epochno <= epoch_limit){
             obj.epochno = obj.next_epochno;
+            console.log("CURR EPOCH: " + obj.epochno);
             while (obj.next_patno <= obj.environment.sequences.length){
                 obj.patno = obj.next_patno;
                 obj.next_patno += 1;
@@ -331,6 +345,10 @@ var bp_net = function (pools) {
                     obj.change_weights();
                 }
                 if (obj.done_updating_patno){
+                    return false;
+                }
+                //just for debugging
+                if (obj.epochno == 2){
                     return false;
                 }
             }
