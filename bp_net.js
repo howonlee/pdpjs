@@ -35,8 +35,6 @@ var bp_net = function (pools) {
                 switch (obj.pools[i].projections[j].using.constraint_type){
                     case "random":
                         console.log("doing random");
-                        var len = obj.pools[i].projections[j].using.weights.getSize().height;
-                        obj.pools[i].projections[j].using.weights = new goog.math.Matrix(len, len);
                         obj.pools[i].projections[j].using.weights =
                             goog.math.Matrix.map(obj.pools[i].projections[j].using.weights,
                                     function(x) {
@@ -45,8 +43,6 @@ var bp_net = function (pools) {
                         break;
                     case "scalar":
                         console.log("doing scalar");
-                        var len = obj.pools[i].projections[j].using.weights.getSize().height;
-                        obj.pools[i].projections[j].using.weights = new goog.math.Matrix(len, len);
                         obj.pools[i].projections[j].using.weights =
                             goog.math.Matrix.map( obj.pools[i].projections[j].using.weights,
                                     function(x, i, j){
@@ -93,9 +89,7 @@ var bp_net = function (pools) {
         console.log(obj.pools);
         var pat = obj.environment.current_patterns;
         for (var i = 0; i < obj.pools.length; i++){
-            obj.pools[i].target = obj.pools[i].target.map(function(x) {
-                return null;
-            });
+            obj.pools[i].target = goog.math.Matrix.map(obj.pools[i].target, function(x){ return null; });
         }
         var pooli = -1;
         for (var i = 0; i < pat.length; i++){
@@ -108,13 +102,13 @@ var bp_net = function (pools) {
             }
             switch (pat[i].type){
                 case "H":
-                    obj.pools[pooli].activation = $V(pat[i].pattern);
-                    var act = obj.pools[pooli].activation.elements;
-                    var net_input = [];
+                    obj.pools[pooli].activation = new goog.math.Matrix(Array(pat[i].pattern));
+                    var act = obj.pools[pooli].activation.array_;
+                    obj.pools[pooli].net_input = [];
                     for (var i = 0; i < act.length; i++){
                         if (act[i] === 1){ act[i] = 0.99999988; }
                         if (act[i] === 0){ act[i] = 0.00000012; }
-                        net_input.push(Math.log(act[i] /(1 - act[i])));
+                        obj.pools[pooli].net_input.push(Math.log(act[i] /(1 - act[i])));
                     }
                     obj.pools[pooli].clamped_activation = 2;
                     break;
@@ -144,33 +138,18 @@ var bp_net = function (pools) {
                 console.log(from);
                 console.log("Current pools' net_input:");
                 console.log(obj.pools[i].net_input);
-                console.log("Current projection weights:");
-                console.log(obj.pools[i].projections[j].using.weights);
                 //gotta transpose this stuff!
-                var currWeights = obj.pools[i].projections[j].using.weights;
-                //I dunno where transposition goes, tbh
+                var currWeights = obj.pools[i].projections[j].using.weights.getTranspose();
+                console.log("Current projection weights:");
+                console.log(currWeights);
                 if (typeof from.activation != "number"){
-                    //obj.pools[i].net_input = obj.pools[i].net_input.add(obj.pools[i].projections[j].using.weights.transpose().x(from.activation));
-                    obj.pools[i].net_input = obj.pools[i].net_input
-                        .map(function(x, k){ 
-                            var toReturn = x; 
-                            for (var l = 0; l < currWeights.elements[k-1].length; l++){
-                                toReturn += currWeights.elements[k-1][l];
-                            }
-                            //currently ignoring from.activation right now
-                            return toReturn;
-                        });
+                    obj.pools[i].net_input = obj.pools[i].net_input.add(
+                            from.activation.multiply(currWeights)
+                            );
                 } else {
-                    obj.pools[i].net_input = obj.pools[i].net_input
-                        .map(function(x, k){ 
-                            var toReturn = x; 
-                            console.log("currWeight:");
-                            console.log(currWeights.elements[k-1]);
-                            for (var l = 0; l < currWeights.elements[k-1].length; l++){
-                                toReturn += currWeights.elements[k-1][l];
-                            }
-                            return toReturn;
-                        });
+                    obj.pools[i].net_input = obj.pools[i].net_input.add(
+                            currWeights.multiply(from.activation)
+                            );
                 }
                 console.log("checkpoint 2");
                 console.log("net_input is: ");
@@ -179,16 +158,11 @@ var bp_net = function (pools) {
             switch (obj.pools[i].activation_function){
                 case "logistic":
                     console.log("try logistic");
-                    obj.pools[i].activation = obj.pools[i].activation
-                        .map(function(x, i, j) {
-                            console.log("Pool:");
-                            console.log(obj.pools[i-1]);
-                            console.log(obj.pools[i-1].net_input.e(i, j));
-                            return x + obj.logistic(obj.pools[i-1].net_input.e(i, j));
-                        });
+                    var currInput = goog.math.Matrix.map(obj.pools[i].net_input, obj.logistic);
+                    obj.pools[i].activation = obj.pools[i].activation.add(currInput);
                     console.log("activation is:");
                     console.log(obj.pools[i].activation);
-                        break;
+                    break;
                 case "linear":
                     console.log("try linear");
                     obj.pools[i].activation = obj.pools[i].activation.add(obj.pools[i].net_input);
@@ -402,5 +376,5 @@ var bp_net = function (pools) {
     }
     obj.reset_weights(); 
     obj.set_environment(xorenv)
-    return obj;
+        return obj;
 };

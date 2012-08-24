@@ -42,7 +42,7 @@ var pool = function(name, count, type, copy_from){
             break;
         case "bias":
             obj.clamped_activation = 2;
-            obj.activation = new goog.math.Matrix([[1]]);
+            obj.activation = 1;
             break;
         case "connection":
             break;
