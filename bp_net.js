@@ -115,8 +115,8 @@ var bp_net = function (pools) {
             }
             switch (pat[i].type){
                 case "H":
-                    obj.pools[pooli].activation = pat[i].pattern;
-                    var act = obj.pools[pooli].activation;
+                    obj.pools[pooli].activation = $V(pat[i].pattern);
+                    var act = obj.pools[pooli].activation.elements;
                     var net_input = [];
                     for (var i = 0; i < act.length; i++){
                         if (act[i] === 1){ act[i] = 0.99999988; }
@@ -158,13 +158,13 @@ var bp_net = function (pools) {
                 //I dunno where transposition goes, tbh
                 if (typeof from.activation != "number"){
                     //obj.pools[i].net_input = obj.pools[i].net_input.add(obj.pools[i].projections[j].using.weights.transpose().x(from.activation));
-                    //currently ignoring from.activation right now
                     obj.pools[i].net_input = obj.pools[i].net_input
                         .map(function(x, k){ 
                             var toReturn = x; 
                             for (var l = 0; l < currWeights.elements[k-1].length; l++){
                                 toReturn += currWeights.elements[k-1][l];
                             }
+                            //currently ignoring from.activation right now
                             return toReturn;
                         });
                 } else {
@@ -192,7 +192,9 @@ var bp_net = function (pools) {
                             console.log(obj.pools[i-1]);
                             console.log(obj.pools[i-1].net_input.e(i, j));
                             return x + obj.logistic(obj.pools[i-1].net_input.e(i, j));
-                        })
+                        });
+                    console.log("activation is:");
+                    console.log(obj.pools[i].activation);
                         break;
                 case "linear":
                     console.log("try linear");
@@ -200,19 +202,22 @@ var bp_net = function (pools) {
                     break;
             }
         }
+        console.log("checkpoint 3, the output is computed");
     };
 
     //NOT TESTED
     obj.compute_error = function(){
         console.log("computing error...");
-        for (var i = obj.pools.length; i > 0; i--){
+        for (var i = obj.pools.length - 1; i >= 0; i--){
             obj.pools[i].delta = obj.pools[i].delta_reset_value;
             obj.pools[i].error = obj.pools[i].error_reset_value;
+            console.log("checkpoint 1: reset error");
             if (obj.pools[i].target){
                 obj.pools[i].error = obj.pools[i].error
                     .add(obj.pools[i].target)
                     .subtract(obj.pools[i].activation);
             }
+            console.log("checkpoint 2: adjusted error if pool was target");
             switch (obj.train_options.errmeas){
                 case "cee":
                     obj.pools[i].delta = obj.pools[i].error;
@@ -220,21 +225,24 @@ var bp_net = function (pools) {
                 case "sse":
                     obj.pools[i].delta = obj.pools[i].error
                         .map(function(x, i, j){
-                            var act = obj.pools[i].activation.e(i, j);
+                            console.log(obj.pools);
+                            var act = obj.pools[i-1].activation.e(i, j);
                             return x * act * (1 - act);
                         });
                     break;
             }
+            console.log("checkpoint 3: adjusted delta with error");
             for (var j = 0; j < obj.pools[i].projections.length; j++){
                 obj.pools[i].projections[j].from.error =
                     obj.projections[j].from.error
                     .add(obj.pools[i].delta.x(obj.pools[i].projections[j].using.weights));
             }
+            console.log("checkpoint 4: adjusted projection errors");
             if (obj.pools[i].type === "connection"){
                 obj.pools[i].error_reset_value =
                     obj.pools[i].error_reset_value.add(obj.pools[i].error);
             }
-
+            console.log("checkpoint 5: computed errors");
         }
     };
 

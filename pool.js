@@ -28,9 +28,7 @@ var pool = function(name, count, type, copy_from){
     if (type) { obj.type = type }
     if (copy_from) { 
         obj.clamped_activation = 2;
-        temp = [];
-        for (var i = 0; i < count; i++){ temp.push(0.5); }
-        obj.activation = $V(temp)
+        //activation set above
         obj.copy_from = copy_from;
         obj.copyback = true;
     }
@@ -43,7 +41,7 @@ var pool = function(name, count, type, copy_from){
             break;
         case "bias":
             obj.clamped_activation = 2;
-            obj.activation = 1;//note that this is NOT a matrix
+            obj.activation = $V([1]);
             break;
         case "connection":
             break;
