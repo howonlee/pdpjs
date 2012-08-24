@@ -1,24 +1,25 @@
+goog.require('goog.math.Matrix');
 
 var pool = function(name, count, type, copy_from){
     var obj = {};
     obj.name = name;
     obj.unit_count = count;
-    obj.error = Vector.Zero(count);
-    obj.error_reset_value = Vector.Zero(count);
-    obj.target = Vector.Zero(count);
-    obj.delta = Vector.Zero(count);
-    obj.delta_reset_value = Vector.Zero(count);
+    obj.error = new goog.math.Matrix(1, count);
+    obj.error_reset_value = new goog.math.Matrix(1, count);
+    obj.target = new goog.math.Matrix(1, count);
+    obj.delta = new goog.math.Matrix(1, count);
+    obj.delta_reset_value = new goog.math.Matrix(1, count);
     obj.clamped_activation = 0;//0 no, 1 soft, 2 hard
-    obj.activation = Vector.Zero(count);
-    obj.activation_reset_value = Vector.Zero(count);
-    obj.net_input = Vector.Zero(count);
-    obj.net_input_reset_value = Vector.Zero(count);
-    obj.activation_history = Vector.Zero(count);
+    obj.activation = new goog.math.Matrix(1, count);
+    obj.activation_reset_value = new goog.math.Matrix(1, count);
+    obj.net_input = new goog.math.Matrix(1, count);
+    obj.net_input_reset_value = new goog.math.Matrix(1, count);
+    obj.activation_history = new goog.math.Matrix(1, count);
     obj.activation_function = "logistic";
-    obj.error_history = Vector.Zero(count);
-    obj.extern_input = Vector.Zero(count);
-    obj.excitation = Vector.Zero(count);
-    obj.inhibition = Vector.Zero(count);
+    obj.error_history = new goog.math.Matrix(1, count);
+    obj.extern_input = new goog.math.Matrix(1, count);
+    obj.excitation = new goog.math.Matrix(1, count);
+    obj.inhibition = new goog.math.Matrix(1, count);
     obj.projections = [];//normal js arrays for these
     obj.outgoing_projections = [];
     obj.noise = 0;
@@ -41,7 +42,7 @@ var pool = function(name, count, type, copy_from){
             break;
         case "bias":
             obj.clamped_activation = 2;
-            obj.activation = $V([1]);
+            obj.activation = new goog.math.Matrix([[1]]);
             break;
         case "connection":
             break;

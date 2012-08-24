@@ -1,9 +1,11 @@
 bp_net_obj = {
     name : null,
     cpname : null,
+    epochno : 0,
     gcor : null,
-    next_patno : null,
-    next_epochno : null,
+    next_patno : 1,
+    next_epochno : 1,
+    patno : 0,
     pools : null,
     pools_by_name : null,
     environment : null,
@@ -61,12 +63,10 @@ bp_net_obj = {
                    "templatesize" : [],
                    "cellsize" : []
                },
-    seed : null,
     manual_bias : false,
     pss : 0,
     pce : 0,
     tss : 0,
     tce : 0,
     css : 0,
-    nancolor : [0.97, 0.97, 0.97]
 }

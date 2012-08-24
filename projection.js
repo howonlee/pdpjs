@@ -10,10 +10,10 @@ var projection = function(rec, send, type, con){
         }
     }
 
-    obj.weights = Matrix.Zero(rec.unit_count, send.unit_count);
-    obj.weights = obj.weights.map(function(x) { return x + 1; });
-    obj.weds = Matrix.Zero(rec.unit_count, send.unit_count);
-    obj.prev_weds = obj.weds;
-    obj.weight_deltas = Matrix.Zero(rec.unit_count, send.unit_count);
+    obj.weights = new goog.math.Matrix(rec.unit_count, send.unit_count);//want to be ones
+    obj.weights = goog.math.Matrix.map(obj.weights, function(x){ return x + 1; });
+    obj.weds = new goog.math.Matrix(rec.unit_count, send.unit_count);
+    obj.pre_weds = new goog.math.Matrix(rec.unit_count, send.unit_count);
+    obj.weight_deltas = new goog.math.Matrix(rec.unit_count, send.unit_count);
     return obj;
 }

@@ -26,13 +26,6 @@ var bp_net = function (pools) {
             }
         }
     };
-    obj.type = "bp";
-    obj.pools = new Array(pool("bias", 1, "bias"));
-    obj.pools = obj.pools.concat(pools);
-    console.log(obj.pools);
-    if (!obj.manual_bias){
-        obj.add_bias_projections(obj);
-    }
 
     //HALF TESTED
     obj.reset_weights = function(){
@@ -42,36 +35,34 @@ var bp_net = function (pools) {
                 switch (obj.pools[i].projections[j].using.constraint_type){
                     case "random":
                         console.log("doing random");
-                        var len = obj.pools[i].projections[j].using.weights.elements.length;
+                        var len = obj.pools[i].projections[j].using.weights.getSize().height;
+                        obj.pools[i].projections[j].using.weights = new goog.math.Matrix(len, len);
                         obj.pools[i].projections[j].using.weights =
-                            Matrix.Random(len, len);
-                        obj.pools[i].projections[j].using.weights =
-                            obj.pools[i].projections[j].using.weights.map(
+                            goog.math.Matrix.map(obj.pools[i].projections[j].using.weights,
                                     function(x) {
-                                        return(x - 0.5) * obj.train_options.wrange;
+                                        return(Math.random() - 0.5) * obj.train_options.wrange;
                                     });
                         break;
                     case "scalar":
                         console.log("doing scalar");
-                        var len = obj.pools[i].projections[j].using.weights.elements.length;
-                        obj.pools[i].projections[j].using.weights = Matrix.Zero(len, len);
+                        var len = obj.pools[i].projections[j].using.weights.getSize().height;
+                        obj.pools[i].projections[j].using.weights = new goog.math.Matrix(len, len);
                         obj.pools[i].projections[j].using.weights =
-                            obj.pools[i].projections[j].using.weights.map(
+                            goog.math.Matrix.map( obj.pools[i].projections[j].using.weights,
                                     function(x, i, j){
-                                        return (x + 1) * obj.pools[i].projections[j].using.constraint.e(i, j);
+                                        return (x + 1) * obj.pools[i].projections[j].using.constraint.getValueAt(i, j);
                                     });
                         break;
                 }
             }
         }
     };
-    obj.reset_weights(); 
 
     //TESTED
     obj.reset_net_input = function(){
         console.log("resetting net inputs...");
         for (var i = 0; i < obj.pools.length; i++){
-            obj.pools[i].net_input = Vector.Zero(obj.pools[i].net_input.elements.length);
+            obj.pools[i].net_input = new goog.math.Matrix(1,obj.pools[i].net_input.getSize().width);
         }
     };
 
@@ -98,6 +89,8 @@ var bp_net = function (pools) {
     //NOT TESTED
     obj.clamp_pools = function(){
         console.log("clamping pools...");
+        console.log("pools:");
+        console.log(obj.pools);
         var pat = obj.environment.current_patterns;
         for (var i = 0; i < obj.pools.length; i++){
             obj.pools[i].target = obj.pools[i].target.map(function(x) {
@@ -225,7 +218,6 @@ var bp_net = function (pools) {
                 case "sse":
                     obj.pools[i].delta = obj.pools[i].error
                         .map(function(x, i, j){
-                            console.log(obj.pools);
                             var act = obj.pools[i-1].activation.e(i, j);
                             return x * act * (1 - act);
                         });
@@ -233,9 +225,26 @@ var bp_net = function (pools) {
             }
             console.log("checkpoint 3: adjusted delta with error");
             for (var j = 0; j < obj.pools[i].projections.length; j++){
-                obj.pools[i].projections[j].from.error =
-                    obj.projections[j].from.error
-                    .add(obj.pools[i].delta.x(obj.pools[i].projections[j].using.weights));
+                console.log("delta:");
+                console.log(obj.pools[i].delta);
+                console.log("weights:");
+                console.log(obj.pools[i].projections[j].using.weights);
+                console.log("newerrordelta:");
+                var newerrordelta = obj.pools[i].delta.map(function(x, k){
+                    var toReturn = x;
+                    for (var l = 0; l < obj.pools[i].projections[j].using.weights.elements[k-1].length; l++){
+                        x += obj.pools[i].projections[j].using.weights.elements[k-1][l];
+                    }
+                    return toReturn;
+                });
+                console.log(newerrordelta);
+                console.log("currerror:");
+                console.log(obj.pools[i].projections[j].from.error);
+                if (obj.pools[i].projections[j].from.error){//stopgap measure, there's something fishy about this
+                    obj.pools[i].projections[j].from.error =
+                        obj.pools[i].projections[j].from.error
+                        .add(newerrordelta);
+                }
             }
             console.log("checkpoint 4: adjusted projection errors");
             if (obj.pools[i].type === "connection"){
@@ -324,7 +333,7 @@ var bp_net = function (pools) {
         console.log("summing stats....");
         obj.pss = 0.0;
         obj.pce = 0.0;
-        if (obj.patno === 1){ obj.tss = 0.0; }
+        if (obj.patno === 0){ obj.tss = 0.0; }
         //fill in here
     };
 
@@ -337,6 +346,7 @@ var bp_net = function (pools) {
             obj.epochno = obj.next_epochno;
             while (obj.next_patno <= obj.environment.sequences.length){
                 obj.patno = obj.next_patno;
+                obj.next_patno += 1;
                 obj.environment.sequence_index = obj.patno;
                 obj.clamp_pools();
                 obj.compute_output();
@@ -346,13 +356,12 @@ var bp_net = function (pools) {
                 if (obj.train_options.lgrain === "pattern") {
                     obj.change_weights();
                 }
-                obj.next_patno += 1;
                 if (obj.done_updating_patno){
                     return false;
                 }
             }
             if (obj.train_options.lgrain === "epoch"){ obj.change_weights(); }
-            obj.next_patno = 1;
+            obj.next_patno = 0;
             obj.epochno = obj.next_epochno;
             obj.next_epochno += 1;
             if (obj.done_updating_epochno) { return false; } 
@@ -372,7 +381,7 @@ var bp_net = function (pools) {
             obj.next_patno = obj.patno + 1;
             if (obj.done_updating_patno) { return false; }
         }
-        obj.next_patno = 1;
+        obj.next_patno = 0;
         obj.tss = 0;
     };
 
@@ -382,6 +391,16 @@ var bp_net = function (pools) {
         obj.environment = value;
         obj.clamp_pools();
     };
+
+    //INITIAL SETUP
+    obj.type = "bp";
+    obj.pools = new Array(pool("bias", 1, "bias"));
+    obj.pools = obj.pools.concat(pools);
+    console.log(obj.pools);
+    if (!obj.manual_bias){
+        obj.add_bias_projections(obj);
+    }
+    obj.reset_weights(); 
     obj.set_environment(xorenv)
     return obj;
 };
