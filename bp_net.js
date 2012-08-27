@@ -11,6 +11,7 @@ var bp_net = function (pools) {
         if (retval < -15.935773974) { retval = -15.935773974; }
         return (1.0 / (1.0 + Math.exp(-1 * retval)));
     };
+    
     //TESTED
     obj.add_bias_projections = function () {
         console.log("adding bias projections...");
@@ -27,7 +28,7 @@ var bp_net = function (pools) {
         }
     };
 
-    //HALF TESTED
+    //TESTED
     obj.reset_weights = function(){
         console.log("resetting weights...");
         for (var i = 0; i < obj.pools.length; i++){
@@ -331,6 +332,7 @@ var bp_net = function (pools) {
             if (obj.pools[i].type !== "output"){ continue; }
             if (!obj.pools[i].target) { continue; }
             if (obj.pools[i].target[0] < 0) { continue; }
+            console.log("summing stats actually");
             goog.math.Matrix.forEach(obj.pools[i].error, function(num){
                 obj.pss += (num * num);
             });
