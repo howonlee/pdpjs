@@ -82,49 +82,56 @@ var bp_net = function (pools) {
         obj.clamp_pools();
     };
 
+    obj.clip = function(num){
+        if (num === 1) { return 0.99999988; }
+        if (num === 0) { return 0.00000012; }
+        return num;
+    }
+
     //NOT TESTED
     obj.clamp_pools = function(){
         console.log("clamping pools...");
         console.log("pools:");
         console.log(obj.pools);
-        var pat = obj.environment.current_patterns;
+        console.log("patterns:");
+        console.log(obj.environment.current_patterns);
         for (var i = 0; i < obj.pools.length; i++){
-            //obj.pools[i].target = goog.math.Matrix.map(obj.pools[i].target, function(x){ return null; });
-            //maybe this
             obj.pools[i].target = null;
         }
         var pooli = -1;
-        for (var i = 0; i < pat.length; i++){
-            if (!pat[i].pool){
-                if (pat[i].type === "T"){
-                    pooli = obj.pools.length;
+        for (var i = 0; i < obj.environment.current_patterns.length; i++){
+            if (!obj.environment.current_patterns[i].pool){
+                if (obj.environment.current_patterns[i].type === "T"){
+                    pooli = obj.pools.length - 1;
                 } else {
                     pooli = 1; //first non-bias pool
                 }
             }
-            switch (pat[i].type){
+            console.log("pooli:");
+            console.log(pooli);
+            switch (obj.environment.current_patterns[i].type){
                 case "H":
-                    obj.pools[pooli].activation = new goog.math.Matrix(Array(pat[i].pattern));
+                    obj.pools[pooli].activation = new goog.math.Matrix(Array(obj.environment.current_patterns[i].pattern));
+                    obj.pools[pooli].activation = goog.math.Matrix.map(obj.pools[pooli].activation, obj.clip);
                     var act = obj.pools[pooli].activation.array_;
                     obj.pools[pooli].net_input = [];
-                    for (var i = 0; i < act.length; i++){
-                        if (act[i] === 1){ act[i] = 0.99999988; }
-                        if (act[i] === 0){ act[i] = 0.00000012; }
-                        obj.pools[pooli].net_input.push(Math.log(act[i] /(1 - act[i])));
+                    for (var k = 0; k < act.length; k++){
+                        obj.pools[pooli].net_input.push(Math.log(act[0][k] /(1 - act[0][k])));
                     }
                     obj.pools[pooli].clamped_activation = 2;
                     break;
                 case "S":
-                    obj.pools[pooli].net_input = pat[i].pattern;
+                    obj.pools[pooli].net_input = obj.environment.current_patterns[i].pattern;
                     obj.pools[pooli].clamped_activation = 1;
                     break;
                 case "T":
-                    obj.pools[pooli].target = pat[i].pattern;
+                    obj.pools[pooli].target = obj.environment.current_patterns[i].pattern;
                     obj.pools[pooli].clamped_error = true;
                     break;
             }
         }
     };
+
 
     //NOT TESTED
     obj.compute_output = function(){
@@ -319,7 +326,11 @@ var bp_net = function (pools) {
         obj.pss = 0.0;
         obj.pce = 0.0;
         if (obj.patno === 0){ obj.tss = 0.0; }
-        //fill in here
+        for (var i = 0; i < obj.pools.length; i++){
+            if (obj.pools[i].type !== "output"){ continue; }
+        }
+        obj.tss += obj.pss;
+        obj.tce += obj.pce;
     };
 
     //NOT TESTED
