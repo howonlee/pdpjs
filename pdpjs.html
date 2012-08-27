@@ -7,10 +7,6 @@
                 display:inline-block;
                 float:left;
             }
-            .img{
-                float:none;
-                width:60%
-            }
             .right{
                 float:right;
                 width:20%;
@@ -18,15 +14,22 @@
             .wide{
                 width:100%;
             }
+            #svg{
+                height:1px;
+                width:60%;
+            }
         </style>
         <script src="./closure-lib/closure/goog/base.js"></script>
         <script>goog.require('goog.math.Matrix');</script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
         <script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
         <script src="./pool.js"></script>
         <script src="./projection.js"></script>
         <script src="./xorenv.js"></script>
         <script src="./bp_net_obj.js"></script>
         <script src="./bp_net.js"></script>
+        <script>currbp = bp_net([pool("blah", 4), pool("walla", 4)]);</script>
     </head>
     <body>
         <form>
@@ -78,5 +81,6 @@
             <svg xmlns="http://www.w3.org/2000/svg" version="1.1" id="svg" >
             </svg>
         </div>
+        <script src="./view.js"></script>
     </body>
 </html>
