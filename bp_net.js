@@ -190,7 +190,7 @@ var bp_net = function (pools) {
             console.log("checkpoint 1: reset error");
             if (obj.pools[i].target){
                 obj.pools[i].error = obj.pools[i].error
-                    .add(obj.pools[i].target)
+                    //.add(obj.pools[i].target[0])//not sure how this works
                     .subtract(obj.pools[i].activation);
             }
             //note that the above will never happen
@@ -325,9 +325,23 @@ var bp_net = function (pools) {
         console.log("summing stats....");
         obj.pss = 0.0;
         obj.pce = 0.0;
+        var ce = 0;
         if (obj.patno === 0){ obj.tss = 0.0; }
         for (var i = 0; i < obj.pools.length; i++){
             if (obj.pools[i].type !== "output"){ continue; }
+            if (!obj.pools[i].target) { continue; }
+            if (obj.pools[i].target[0] < 0) { continue; }
+            goog.math.Matrix.forEach(obj.pools[i].error, function(num){
+                obj.pss += (num * num);
+            });
+            goog.math.Matrix.forEach(obj.pools[i].activation, function(num){
+                if (obj.pools[i].target[0] === 1) {
+                    ce += Math.log(num);
+                } else if (obj.pools[i].target[0] === 0){
+                    ce += Math.log(1 - num);
+                }
+            });
+            obj.pce -= ce;
         }
         obj.tss += obj.pss;
         obj.tce += obj.pce;
