@@ -6,6 +6,15 @@ $(document).ready(function(){
     var grid = function(num){ return 30 + (30 * num);};
     var rectSize = 30;
 
+    var getColor = function(number){
+        if (number > 0){
+            //red
+        } else {
+            //blue
+        }
+        return {"stroke": "#FFF", "fill": "rgb(66%, 66%, 66%)"};
+    };
+
     //labels start here
     var epochlabel = paper.text(grid(0), grid(0), "epochno");//edit automajically
     var tsslabel = paper.text(grid(6), grid(0), "tss");
@@ -40,22 +49,24 @@ $(document).ready(function(){
             paper.rect(grid(5), grid(2), rectSize, rectSize),
             paper.rect(grid(6), grid(2), rectSize, rectSize)
             );
-    senderacts.attr({"stroke": "#FFF", "fill": "#CCC"});
+    senderacts.attr(getColor(0));
 
-    var weights = paper.set();
-    weights.push(
+    var proj1 = paper.set();
+    proj1.push(
             paper.rect(grid(2), grid(4), rectSize, rectSize),
             paper.rect(grid(3), grid(4), rectSize, rectSize),
             paper.rect(grid(2), grid(5), rectSize, rectSize),
             paper.rect(grid(3), grid(5), rectSize, rectSize)
             );
-    weights.attr({"stroke": "#FFF", "fill": "#CCC"});
+    proj1.attr(getColor(0));
 
     //is this weights? gotta look this up
-    var weight5 = paper.rect(grid(5), grid(6), rectSize, rectSize);
-    var weight6 = paper.rect(grid(6), grid(6), rectSize, rectSize);
-    weight5.attr({"stroke": "#FFF", "fill": "#CCC"});
-    weight6.attr({"stroke": "#FFF", "fill": "#CCC"});
+    var proj2 = paper.set();
+    proj2.push(
+            paper.rect(grid(5), grid(6), rectSize, rectSize),
+            paper.rect(grid(6), grid(6), rectSize, rectSize)
+            )
+    proj2.attr(getColor(0));
 
     var biases = paper.set(); 
     biases.push(
@@ -63,7 +74,7 @@ $(document).ready(function(){
             paper.rect(grid(8), grid(5), rectSize, rectSize),
             paper.rect(grid(8), grid(6), rectSize, rectSize)
             );
-    biases.attr({"stroke": "#FFF", "fill": "#CCC"});
+    biases.attr(getColor(0));
 
     var nets = paper.set();
     nets.push(
@@ -71,7 +82,7 @@ $(document).ready(function(){
             paper.rect(grid(10), grid(5), rectSize, rectSize),
             paper.rect(grid(10), grid(6), rectSize, rectSize)
             );
-    nets.attr({"stroke": "#FFF", "fill": "#CCC"});
+    nets.attr(getColor(0));
 
     var acts = paper.set();
     acts.push(
@@ -79,7 +90,7 @@ $(document).ready(function(){
             paper.rect(grid(12), grid(5), rectSize, rectSize),
             paper.rect(grid(12), grid(6), rectSize, rectSize)
             );
-    acts.attr({"stroke": "#FFF", "fill": "#CCC"});
+    acts.attr(getColor(0));
 
     var tars = paper.set();
     tars.push(
@@ -87,7 +98,7 @@ $(document).ready(function(){
             paper.rect(grid(14), grid(5), rectSize, rectSize),
             paper.rect(grid(14), grid(6), rectSize, rectSize)
             );
-    tars.attr({"stroke": "#FFF", "fill": "#CCC"});
+    tars.attr(getColor(0));
 
     var dels = paper.set();
     dels.push(
@@ -95,19 +106,26 @@ $(document).ready(function(){
             paper.rect(grid(16), grid(5), rectSize, rectSize),
             paper.rect(grid(16), grid(6), rectSize, rectSize)
             );
-    dels.attr({"stroke": "#FFF", "fill": "#CCC"});
+    dels.attr(getColor(0));
 
     paper.updateOurCanvas = function(isReset){
         if (isReset){
-            senderacts.attr({"stroke": "#FFF", "fill": "#CCC"});
-            weights.attr({"stroke": "#FFF", "fill": "#CCC"});
-            weight5.attr({"stroke": "#FFF", "fill": "#CCC"});
-            weight6.attr({"stroke": "#FFF", "fill": "#CCC"});
-            biases.attr({"stroke": "#FFF", "fill": "#CCC"});
-            nets.attr({"stroke": "#FFF", "fill": "#CCC"});
-            acts.attr({"stroke": "#FFF", "fill": "#CCC"});
-            tars.attr({"stroke": "#FFF", "fill": "#CCC"});
-            dels.attr({"stroke": "#FFF", "fill": "#CCC"});
+            senderacts.attr(getColor(0));
+            proj1.attr(getColor(0));
+            proj2.attr(getColor(0));
+            biases.attr(getColor(0));
+            nets.attr(getColor(0));
+            acts.attr(getColor(0));
+            tars.attr(getColor(0));
+            dels.attr(getColor(0));
+            
+            proj1.attr(getColor(0));
+            proj2.attr(getColor(0));
+            biases.attr(getColor(0));
+            nets.attr(getColor(0));
+            acts.attr(getColor(0));
+            tars.attr(getColor(0));
+            dels.attr(getColor(0));
             epochlabel.attr({"text": "epochno"});
             tsslabel.attr({"text": "tss"});
             gcorlabel.attr({"text": "gcor"});
