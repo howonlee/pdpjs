@@ -11,11 +11,11 @@ var xorenv = {
         intervals: {
             name: 'p01',
             clamps: [{
-                pool: "",
+                pool: null,
                 type: "H",
                 pattern: [0, 0]
             }, {
-                pool: "",
+                pool: null,
                 type: "T",
                 pattern: [0]
             }]
@@ -26,11 +26,11 @@ var xorenv = {
         intervals: {
             name: 'p02',
             clamps: [{
-                pool: "",
+                pool: null,
                 type: "H",
                 pattern: [0, 1]
             }, {
-                pool: "",
+                pool: null,
                 type: "T",
                 pattern: [1]
             }]
@@ -41,11 +41,11 @@ var xorenv = {
         intervals: {
             name: 'p03',
             clamps: [{
-                pool: "",
+                pool: null,
                 type: "H",
                 pattern: [1, 0]
             }, {
-                pool: "",
+                pool: null,
                 type: "T",
                 pattern: [1]
             }]
@@ -56,24 +56,24 @@ var xorenv = {
         intervals: {
             name: 'p04',
             clamps: [{
-                pool: "",
+                pool: null,
                 type: "H",
                 pattern: [1, 1]
             }, {
-                pool: "",
+                pool: null,
                 type: "T",
                 pattern: [0]
             }]
         }
     }],
-        sequence_index: 4,
+        sequence_index: 0,
         trainmode: 's',
-        ordering: [3, 1, 2, 4],
+        ordering: [2, 0, 1, 3],
         current_patterns : [
         {
             pool : null,
             type : "H",
-            pattern : [1, 1]
+            pattern : [0,0]
         }, {
             pool : null,
             type : "T",

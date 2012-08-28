@@ -359,10 +359,14 @@ var bp_net = function (pools) {
         while (obj.next_epochno <= epoch_limit){
             obj.epochno = obj.next_epochno;
             console.log("CURR EPOCH: " + obj.epochno);
-            while (obj.next_patno <= obj.environment.sequences.length){
+            while (obj.next_patno < obj.environment.sequences.length){
                 obj.patno = obj.next_patno;
                 obj.next_patno += 1;
                 obj.environment.sequence_index = obj.patno;
+                console.log("current pattern number:");
+                console.log(obj.patno);
+                obj.environment.current_patterns = 
+                    obj.environment.sequences[obj.patno].intervals.clamps;
                 obj.clamp_pools();
                 obj.compute_output();
                 obj.compute_error();
@@ -393,6 +397,10 @@ var bp_net = function (pools) {
         while (obj.next_patno < obj.environment.sequences.length){
             obj.patno = obj.next_patno;
             obj.environment.sequence_index = obj.patno;
+            console.log("current pattern number:");
+            console.log(obj.patno);
+            obj.environment.current_patterns = 
+                obj.environment.sequences[obj.patno].intervals.clamps;
             obj.clamp_pools();
             obj.compute_output();
             obj.compute_error();

@@ -118,14 +118,6 @@ $(document).ready(function(){
             acts.attr(getColor(0));
             tars.attr(getColor(0));
             dels.attr(getColor(0));
-            
-            proj1.attr(getColor(0));
-            proj2.attr(getColor(0));
-            biases.attr(getColor(0));
-            nets.attr(getColor(0));
-            acts.attr(getColor(0));
-            tars.attr(getColor(0));
-            dels.attr(getColor(0));
             epochlabel.attr({"text": "epochno"});
             tsslabel.attr({"text": "tss"});
             gcorlabel.attr({"text": "gcor"});
