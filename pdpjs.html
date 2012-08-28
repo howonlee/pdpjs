@@ -29,7 +29,10 @@
         <script src="./xorenv.js"></script>
         <script src="./bp_net_obj.js"></script>
         <script src="./bp_net.js"></script>
-        <script>currbp = bp_net([pool("in4", 4, "input"), pool("hid4", 4, "hidden"), pool("out4", 4, "output")]);</script>
+        <script>
+            currbp = bp_net([pool("in4", 4, "input"), pool("hid4", 4, "hidden"), pool("out4", 4, "output")]);
+            currnet = currbp;//used in view, controller
+        </script>
     </head>
     <body>
         <form>
@@ -43,11 +46,11 @@
                     </select>
                     <br/>
                     <input type="radio" name="group1" value="training" />
-                    <input type="submit" value="Options" />
+                    <input type="button" value="Options" onClick="setTrainOptions();" />
                     Epoch <input type="text" size="4" />
-                    <input type="submit" value="Stop" />
-                    <input type="submit" value="Run" />
-                    <input type="submit" value="Step" />
+                    <input type="button" value="Stop" onClick="doTrainStop();" />
+                    <input type="button" value="Run" onClick="doTrainRun();" />
+                    <input type="button" value="Step" onClick="doTrainStep();" />
                 </fieldset>
                 <fieldset>
                     <legend>Testing:</legend>
@@ -55,19 +58,19 @@
                     <input type="checkbox" name="testing" />Test
                     <br/>
                     <input type="radio" name="group1" value="training" />
-                    <input type="submit" value="Options" />
+                    <input type="button" value="Options" onClick="setTestOptions();" />
                     Epoch <input type="text" size="4" />
-                    <input type="submit" value="Stop" />
-                    <input type="submit" value="Run" />
-                    <input type="submit" value="Step" />
+                    <input type="button" value="Stop" onClick="doTestStop();" />
+                    <input type="button" value="Run" onClick="doTestRun();" />
+                    <input type="button" value="Step" onClick="doTestStep();" />
                 </fieldset>
                 <fieldset>
-                    <input type="submit" value="Reset" />
-                    <input type="submit" value="Newstart" />
+                    <input type="button" value="Reset" onClick="doReset();" />
+                    <input type="button" value="Newstart" onClick="doNewStart();" />
                     <br/>
-                    <input type="submit" value="Load Weights" />
+                    <input type="button" value="Load Weights" onClick="doLoadWeights();" />
                     <br/>
-                    <input type="submit" value="Save Weights" />
+                    <input type="button" value="Save Weights" onClick = "doSaveWeights();" />
                 </fieldset>
                 <fieldset class="right" >
                     <legend>Patterns:</legend>
@@ -80,5 +83,6 @@
         <div class="img" id="raphbase">
         </div>
         <script src="./view.js"></script>
+        <script src="./controller.js"></script>
     </body>
 </html>

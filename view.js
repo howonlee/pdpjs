@@ -35,7 +35,7 @@ $(document).ready(function(){
             paper.rect(grid(3), grid(2), rectSize, rectSize),
             paper.rect(grid(5), grid(2), rectSize, rectSize),
             paper.rect(grid(6), grid(2), rectSize, rectSize)
-    );
+            );
     senderacts.attr({"stroke": "#FFF", "fill": "#CCC"});
 
     var weights = paper.set();
@@ -44,7 +44,7 @@ $(document).ready(function(){
             paper.rect(grid(3), grid(4), rectSize, rectSize),
             paper.rect(grid(2), grid(5), rectSize, rectSize),
             paper.rect(grid(3), grid(5), rectSize, rectSize)
-    );
+            );
     weights.attr({"stroke": "#FFF", "fill": "#CCC"});
 
     //is this weights? gotta look this up
@@ -58,7 +58,7 @@ $(document).ready(function(){
             paper.rect(grid(8), grid(4), rectSize, rectSize),
             paper.rect(grid(8), grid(5), rectSize, rectSize),
             paper.rect(grid(8), grid(6), rectSize, rectSize)
-    );
+            );
     biases.attr({"stroke": "#FFF", "fill": "#CCC"});
 
     var nets = paper.set();
@@ -66,7 +66,7 @@ $(document).ready(function(){
             paper.rect(grid(10), grid(4), rectSize, rectSize),
             paper.rect(grid(10), grid(5), rectSize, rectSize),
             paper.rect(grid(10), grid(6), rectSize, rectSize)
-    );
+            );
     nets.attr({"stroke": "#FFF", "fill": "#CCC"});
 
     var acts = paper.set();
@@ -74,7 +74,7 @@ $(document).ready(function(){
             paper.rect(grid(12), grid(4), rectSize, rectSize),
             paper.rect(grid(12), grid(5), rectSize, rectSize),
             paper.rect(grid(12), grid(6), rectSize, rectSize)
-    );
+            );
     acts.attr({"stroke": "#FFF", "fill": "#CCC"});
 
     var tars = paper.set();
@@ -82,7 +82,7 @@ $(document).ready(function(){
             paper.rect(grid(14), grid(4), rectSize, rectSize),
             paper.rect(grid(14), grid(5), rectSize, rectSize),
             paper.rect(grid(14), grid(6), rectSize, rectSize)
-    );
+            );
     tars.attr({"stroke": "#FFF", "fill": "#CCC"});
 
     var dels = paper.set();
@@ -90,10 +90,31 @@ $(document).ready(function(){
             paper.rect(grid(16), grid(4), rectSize, rectSize),
             paper.rect(grid(16), grid(5), rectSize, rectSize),
             paper.rect(grid(16), grid(6), rectSize, rectSize)
-    );
+            );
     dels.attr({"stroke": "#FFF", "fill": "#CCC"});
 
-    paper.updateOurCanvas = function(){
-        return false;
+    paper.updateOurCanvas = function(isReset){
+        if (isReset){
+            senderacts.attr({"stroke": "#FFF", "fill": "#CCC"});
+            weights.attr({"stroke": "#FFF", "fill": "#CCC"});
+            weight5.attr({"stroke": "#FFF", "fill": "#CCC"});
+            weight6.attr({"stroke": "#FFF", "fill": "#CCC"});
+            biases.attr({"stroke": "#FFF", "fill": "#CCC"});
+            nets.attr({"stroke": "#FFF", "fill": "#CCC"});
+            acts.attr({"stroke": "#FFF", "fill": "#CCC"});
+            tars.attr({"stroke": "#FFF", "fill": "#CCC"});
+            dels.attr({"stroke": "#FFF", "fill": "#CCC"});
+            epochlabel.attr({"text": "epochno"});
+            tsslabel.attr({"text": "tss"});
+            gcorlabel.attr({"text": "gcor"});
+            cpnamelabel.attr({"text": "cpname"});
+            psslabel.attr({"text": "pss"});
+        } else {
+            epochlabel.attr({"text": "epochno " + currnet.epochno});
+            tsslabel.attr({"text": "tss " + currnet.tss});
+            gcorlabel.attr({"text": "gcor " + currnet.gcor});
+            cpnamelabel.attr({"text": "cpname " + currnet.cpname});
+            psslabel.attr({"text": "pss " + currnet.pss});
+        }
     };
 });
