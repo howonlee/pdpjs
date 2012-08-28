@@ -24,14 +24,17 @@ var setTrainOptions = function(){
 };
 
 var doTrainStop = function(){
+    //currently, this isn't working
     paper.updateOurCanvas(false);
 };
 
 var doTrainRun = function(){
+    currnet.train();
     paper.updateOurCanvas(false);
 };
 
 var doTrainStep = function(){
+    //currently, this has no purpose
     paper.updateOurCanvas(false);
 };
 //end the training stuff
@@ -42,14 +45,17 @@ var setTestOptions = function(){
 };
 
 var doTestStop = function(){
+    //currently, no purpose
     paper.updateOurCanvas(false);
 };
 
 var doTestRun = function(){
+    currnet.test();
     paper.updateOurCanvas(false);
 };
 
 var doTestStep = function(){
+    //currently, no purpose
     paper.updateOurCanvas(false);
 };
 //end the testing stuff

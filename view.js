@@ -8,11 +8,15 @@ $(document).ready(function(){
 
     //labels start here
     var epochlabel = paper.text(grid(0), grid(0), "epochno");//edit automajically
-    var tsslabel = paper.text(grid(3), grid(0), "tss");
-    var gcorlabel = paper.text(grid(3), grid(1), "gcor");
+    var tsslabel = paper.text(grid(6), grid(0), "tss");
+    var gcorlabel = paper.text(grid(6), grid(1), "gcor");
 
-    var cpnamelabel = paper.text(grid(6), grid(0), "cpname");
-    var psslabel = paper.text(grid(6), grid(1), "pss");
+    var cpnamelabel = paper.text(grid(12), grid(0), "cpname");
+    var psslabel = paper.text(grid(12), grid(1), "pss");
+
+    var labelset = paper.set();
+    labelset.push(epochlabel, tsslabel, gcorlabel, cpnamelabel, psslabel);
+    labelset.attr({"text-anchor": "start"});
 
     var senderactslabel = paper.text(grid(0), grid(2), "sender acts:");
     var weightslabel = paper.text(grid(0), grid(4), "weights:");
