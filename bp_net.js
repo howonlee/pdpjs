@@ -2,7 +2,7 @@
 //you MUST set environment immediately after constructor. I don't get it, either
 var bp_net = function (pools) {
     "use strict";
-    var obj = bp_net_obj;//this is the var with presets in
+    var obj = JSON.parse(JSON.stringify(bp_net_obj));//copy constructor
     //TESTED
     obj.logistic = function (val) {
         console.log("Logistic function with input val " + val);
@@ -332,7 +332,7 @@ var bp_net = function (pools) {
             if (obj.pools[i].type !== "output"){ continue; }
             if (!obj.pools[i].target) { continue; }
             if (obj.pools[i].target[0] < 0) { continue; }
-            console.log("summing stats actually");
+            console.log("summing stats actually");//we never get here
             goog.math.Matrix.forEach(obj.pools[i].error, function(num){
                 obj.pss += (num * num);
             });
