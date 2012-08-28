@@ -115,14 +115,15 @@ var bp_net = function (pools) {
                     obj.pools[pooli].activation = new goog.math.Matrix(Array(obj.environment.current_patterns[i].pattern));
                     obj.pools[pooli].activation = goog.math.Matrix.map(obj.pools[pooli].activation, obj.clip);
                     var act = obj.pools[pooli].activation.array_;
-                    obj.pools[pooli].net_input = [];
+                    var tempnetinput = [];
                     for (var k = 0; k < act.length; k++){
-                        obj.pools[pooli].net_input.push(Math.log(act[0][k] /(1 - act[0][k])));
+                        tempnetinput.push(Math.log(act[0][k] /(1 - act[0][k])));
                     }
+                    obj.pools[pooli].net_input = new goog.math.Matrix(Array(tempnetinput));
                     obj.pools[pooli].clamped_activation = 2;
                     break;
                 case "S":
-                    obj.pools[pooli].net_input = obj.environment.current_patterns[i].pattern;
+                    obj.pools[pooli].net_input = new goog.math.Matrix(Array(obj.environment.current_patterns[i].pattern));
                     obj.pools[pooli].clamped_activation = 1;
                     break;
                 case "T":
@@ -356,7 +357,7 @@ var bp_net = function (pools) {
         //the below seems to make more sense
         var epoch_limit = obj.train_options.nepochs;
         console.log("Epoch limit: " + epoch_limit);
-        while (obj.next_epochno <= epoch_limit){
+        while (obj.next_epochno < epoch_limit){
             obj.epochno = obj.next_epochno;
             console.log("CURR EPOCH: " + obj.epochno);
             while (obj.next_patno < obj.environment.sequences.length){

@@ -1,6 +1,7 @@
 //not really a controller, but it helps to think of it this way
 
 var doReset = function(){
+    currnet.reset_net();
     paper.updateOurCanvas(true);
 };
 
