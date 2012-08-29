@@ -1,5 +1,7 @@
 //everything is mutable, basically
 //you MUST set environment immediately after constructor. I don't get it, either
+//
+//to abstract it out, use javascript prototypal inheritance
 var bp_net = function (pools) {
     "use strict";
     var obj = JSON.parse(JSON.stringify(bp_net_obj));//copy constructor

@@ -1,3 +1,5 @@
+//these are the default settings for the bp_net
+
 bp_net_obj = {
     name : null,
     cpname : null,

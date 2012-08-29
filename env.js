@@ -1,5 +1,6 @@
+//incomplete function for creating the environment object from series of patterns
+
 var env = function(epochs){
-    //parse the whitespace yourself: assumes input of arrays of tokened lines
     obj = {};
     temp = [];
     obj.parse_epoch = function(lines){
