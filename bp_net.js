@@ -63,13 +63,13 @@ var bp_net = function (pools) {
         }
     };
 
-    //NOT TESTED
+    //TESTED
     obj.reset_net = function(){
         console.log("resetting net...");
         obj.epochno = 0;
         obj.patno = 0;
-        obj.next_patno = 1;
-        obj.next_epochno = 1;
+        obj.next_patno = 0;
+        obj.next_epochno = 0;
         obj.tss = 0;
         obj.pss = 0;
         obj.gcor = 0;
@@ -79,10 +79,11 @@ var bp_net = function (pools) {
         }
         obj.reset_net_input();
         obj.reset_weights();
-        obj.environment.sequence_index = obj.net_patno;
+        obj.environment.sequence_index = obj.next_patno;
         obj.clamp_pools();
     };
 
+    //TESTED
     obj.clip = function(num){
         if (num === 1) { return 0.99999988; }
         if (num === 0) { return 0.00000012; }
@@ -429,6 +430,6 @@ var bp_net = function (pools) {
         obj.add_bias_projections(obj);
     }
     obj.reset_weights(); 
-    obj.set_environment(xorenv)
-        return obj;
+    obj.set_environment(xorenv);
+    return obj;
 };
